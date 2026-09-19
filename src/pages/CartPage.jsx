@@ -5,6 +5,7 @@ function CartPage() {
     const navigate = useNavigate();
     const { cart, setCart } = useCart();
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const totalFixed = total.toFixed(2);
 
     function removeFromCart(id) {
         const updated = cart.filter(item => item.id !== id);
@@ -15,6 +16,18 @@ function CartPage() {
         return <h2>Корзина пуста</h2>
     }
 
+    function changeQuantity(id, delta) {
+        const updated = cart.map(item => {
+            if (item.id === id) {
+                const newQuantity = item.quantity + delta;
+                if (newQuantity < 1) return item;
+                return { ...item, quantity: newQuantity}
+            }
+            return item;
+        });
+        setCart(updated);
+    }
+
     return (
         <>
             {cart.map((item) => (
@@ -23,10 +36,13 @@ function CartPage() {
                     <h2>{item.title}</h2>
                     <p>{item.price}</p>
                     <p>Количество: {item.quantity}</p>
+                    <button onClick={() => changeQuantity(item.id, -1)}>-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => changeQuantity(item.id, +1)}>+</button>
                     <button onClick={() => removeFromCart(item.id)}>Удалить</button>
                 </div>
             ))}
-            <p>Итого: {total}</p>
+            <p>Итого: {totalFixed}</p>
             <button onClick={() => {
                 setCart([]);
                 navigate('/success')
